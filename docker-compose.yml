@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  node-db:
+    image: "mongo:4"
+    container_name: "node-mongo-server"
+    restart: unless-stopped
+    tty: true
+    command:
+      - '-f'
+      - '/etc/mongod.conf'
+    volumes:
+      - ./docker/mongo/mongod.conf:/etc/mongod.conf
+      - ./docker/data:/data/db
+      - ./docker/backup:/backup
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    ports:
+      - "27017:27017"
+    networks:
+      - backend-network
+  node-js:
+    build: ./docker/node/.
+    container_name: "node-js-back"
+    restart: unless-stopped
+    tty: true
+    volumes: 
+      - ./server:/app/server
+    ports:
+      - "3000:3000"
+    networks:
+      - backend-network
+  
+networks:
+  backend-network:
+    driver: bridge
