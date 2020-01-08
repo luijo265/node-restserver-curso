@@ -3,6 +3,7 @@ require('./config/config')
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+
 mongoose.set('useCreateIndex', true)
 
 const app = express()
@@ -13,7 +14,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
-app.use(require('./routes/usuario'))
+app.use(require('./routes/index'))
 
 console.log('process.env.urlDB', process.env.urlDB);
 mongoose.connect(process.env.urlDB, {
