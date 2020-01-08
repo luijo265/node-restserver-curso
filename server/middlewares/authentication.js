@@ -19,7 +19,7 @@ const verificaToken = (req, res, next) => {
 
     jwt.verify(token, SEED, (err, decoded) => {
 
-        if (err) return resError(res, { message: 'Token no válido' }, 401)
+        if (err) return resError(res, { message: 'Token no válido' })
 
         req.usuario = decoded.usuario
         next()
@@ -28,6 +28,24 @@ const verificaToken = (req, res, next) => {
 
 }
 
+// ======================
+// Verificar AdminRole
+// ======================
+
+let verificaAdmin_role = (req, res, next) => {
+
+    const { role } = req.usuario
+
+    if (role !== 'ADMIN_ROLE') {
+        return resError(res, { message: 'El usuario no es administrador' }, 401)
+    }
+
+    next()
+
+}
+
+
 module.exports = {
-    verificaToken
+    verificaToken,
+    verificaAdmin_role,
 }
