@@ -1,4 +1,4 @@
-const mogoose = require('mongoose')
+const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
 let rolesValidos = {
@@ -6,7 +6,7 @@ let rolesValidos = {
     message: '{VALUE} no es un rol válido'
 }
 
-let Schema = mogoose.Schema
+let Schema = mongoose.Schema
 
 let usuarioSchema = new Schema({
     nombre: {
@@ -55,7 +55,7 @@ usuarioSchema.methods.toJSON = function() {
 // usuarioSchema.method('find', function() {
 //     console.log('Pase por aqui');
 
-//     const schema = mogoose.Model('usuarios')
+//     const schema = mongoose.Model('usuarios')
 
 //     let query = {
 //         estado: true
@@ -68,4 +68,4 @@ usuarioSchema.plugin(uniqueValidator, {
     message: '{PATH} debe de ser único'
 })
 
-module.exports = mogoose.model('Usuario', usuarioSchema)
+module.exports = mongoose.model('Usuario', usuarioSchema)

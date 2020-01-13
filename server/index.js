@@ -4,6 +4,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 
+mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true)
 
 const app = express()
@@ -16,10 +17,9 @@ app.use(bodyParser.json())
 
 app.use(require('./routes/index'))
 
-console.log('process.env.urlDB', process.env.urlDB);
 mongoose.connect(process.env.urlDB, {
     useNewUrlParser: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
 }, (err, res) => {
 
     if (err) throw err;

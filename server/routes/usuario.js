@@ -4,17 +4,24 @@ const bcrypt = require('bcrypt')
 const _ = require('underscore')
 
 const Usuario = require('../models/usuarios')
+const { verificaToken } = require('../middlewares/authentication')
 
 const app = express()
 
-const resError = (res) => {
+const resError = (res, err) => {
     return res.status(400).json({
         ok: false,
         err
     })
 }
 
-app.get('/usuario', function(req, res) {
+app.get('/usuario', verificaToken, (req, res) => {
+
+    // return res.json({
+    //     usuario: req.usuario,
+    //     nombre: req.usuario.nombre,
+    //     email: req.usuario.email,
+    // })
 
     // Si viene dato lo carga sino coloca un cero
     let desde = req.query.desde || 0
@@ -33,7 +40,7 @@ app.get('/usuario', function(req, res) {
         .limit(limite)
         .exec((err, usuarios) => {
 
-            if (err) return resError(usuarios);
+            if (err) return resError(usuarios, err);
 
             Usuario.countDocuments(query, (err, cuantos) => {
                 res.json({
@@ -49,7 +56,7 @@ app.get('/usuario', function(req, res) {
 
 })
 
-app.post('/usuario', function(req, res) {
+app.post('/usuario', verificaToken, (req, res) => {
     let body = req.body
 
     let { nombre, email, password, role } = body;
@@ -78,7 +85,7 @@ app.post('/usuario', function(req, res) {
     })
 })
 
-app.put('/usuario/:id', function(req, res) {
+app.put('/usuario/:id', verificaToken, (req, res) => {
 
     let { id } = req.params;
     let body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado'])
@@ -106,7 +113,7 @@ app.put('/usuario/:id', function(req, res) {
 
 })
 
-app.delete('/usuario/:id', function(req, res) {
+app.delete('/usuario/:id', verificaToken, (req, res) => {
 
     let id = req.params.id
 
@@ -136,10 +143,10 @@ app.delete('/usuario/:id', function(req, res) {
     const query = { _id: id, estado: true }
     Usuario.findOneAndUpdate(query, { estado: false }, options, (err, usuarioBorrado) => {
 
-        if (err) return resError(usuarioBorrado)
+        if (err) return resError(usuarioBorrado, err)
 
         if (!usuarioBorrado) {
-            res.json({
+            return res.json({
                 ok: false,
                 err: {
                     message: 'Usuario no encontrado'

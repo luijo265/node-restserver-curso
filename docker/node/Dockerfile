@@ -4,17 +4,18 @@ RUN npm install -g nodemon
 
 WORKDIR /app
 RUN mkdir -p node_modules
-RUN chown -R node:node /app
 COPY ./package.json .
+# COPY ./script.sh .
+RUN chown -R node:node /app
 USER node
-RUN npm install
+# RUN npm install
 
-RUN ls -la
 
 COPY --chown=node:node . .
 
 EXPOSE 3000
 
-CMD [ "nodemon", "/app/server/index.js" ]
+# CMD [ "nodemon", "/app/server/index.js" ]
+CMD [ "npm", "run", "docker" ]
 
 
