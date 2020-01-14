@@ -14,7 +14,11 @@ let categoriaSchema = new Schema({
     usuario: {
         type: Schema.Types.ObjectId,
         ref: 'Usuario',
-    }
+    },
+    estado: {
+        type: Boolean,
+        default: true,
+    },
 })
 
 module.exports = mongoose.model('Categorias', categoriaSchema)

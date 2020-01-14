@@ -1,6 +1,6 @@
 const express = require('express')
 
-let { verificaToken } = require('../middlewares/authentication')
+let { verificaToken, verificaAdmin_role } = require('../middlewares/authentication')
 
 const { resError } = require('./utils')
 
@@ -14,7 +14,14 @@ let Categoria = require('../models/categorias')
 // =======================
 app.get('/categoria', [verificaToken], (req, res) => {
 
-    Categoria.find((err, categorias) => {
+    /*
+    Categoria.find({})
+        .exec((err, categoriaDb) => {
+            //codigo
+        })    
+    */
+
+    Categoria.find({estado:true},(err, categorias) => {
 
         if (err) return resError(res, err, 500)
 
@@ -38,6 +45,13 @@ app.get('/categoria/:id', [verificaToken], (req, res) => {
     Categoria.findById(id, (err, categoria) => {
 
         if (err) return resError(res, err, 500)
+
+        if (categoria.estado === false) {
+            const error = {
+                message: 'Categoria no encontrada'
+            }
+            return resError(res, error, 400)
+        }
 
         res.json({
             ok: true,
@@ -112,7 +126,7 @@ app.put('/categoria/:id', [verificaToken], (req, res) => {
             if (!categoria) {
 
                 let e = {
-                    message: 'categoria no encontrado'
+                    message: 'categoria no encontrada'
                 }
 
                 return resError(res, e, 400)
@@ -141,7 +155,49 @@ app.put('/categoria/:id', [verificaToken], (req, res) => {
 // Remover una nueva categoria
 // =======================
 // Solo un administrador y pedir token
-// app.delete('/categoria')
+app.delete('/categoria/:id', [ verificaToken, verificaAdmin_role ], (req, res) => {
+
+    let id = req.params.id
+
+    let update = {
+        estado: false
+    }
+
+    let options = {
+        new: true,
+        runValidators: true,
+    }
+
+    let query = {
+        _id: id, 
+        usuario: req.usuario._id,
+        estado: true
+    }
+
+    Categoria.findOneAndUpdate(query, update, options, (err, categoria) => {
+
+        if (err) return resError(res, err, 500)
+
+        if (!categoria) {
+
+            let e = {
+                message: 'categoria no encontrada'
+            }
+
+            return resError(res, e, 400)
+
+        }
+
+        res.json({
+            ok: true,
+            categoria
+        })
+
+    })
+
+
+
+})
 
 
 module.exports = app
