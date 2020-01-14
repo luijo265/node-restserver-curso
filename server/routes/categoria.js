@@ -15,13 +15,15 @@ let Categoria = require('../models/categorias')
 app.get('/categoria', [verificaToken], (req, res) => {
 
     /*
-    Categoria.find({})
-        .exec((err, categoriaDb) => {
             //codigo
         })    
-    */
-
     Categoria.find({estado:true},(err, categorias) => {
+    */
+    Categoria.find({})
+        .sort('descripcion')
+        .populate('usuario')
+        .exec((err, categorias) => {
+
 
         if (err) return resError(res, err, 500)
 
