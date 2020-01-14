@@ -4,6 +4,9 @@ const bcrypt = require('bcrypt')
 
 const jwt = require('jsonwebtoken')
 
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.CLIENT_ID);
+
 const Usuario = require('../models/usuarios')
 
 const app = express()
@@ -36,5 +39,34 @@ app.post('/login', (req, res) => {
 
     })
 })
+
+// Configuraciones de google
+async function verify( token ) {
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.CLIENT_ID,  // Specify the CLIENT_ID of the app that accesses the backend
+    });
+    const payload = ticket.getPayload();
+
+    console.log(payload.name)
+    console.log(payload.email)
+    console.log(payload.picture)
+
+}
+
+app.post('/google', (req, res) => {
+
+    let body = req.body
+
+    verify(body.idtoken)
+        .catch( console.log )
+
+    res.json({
+        ok:true,
+        body
+    })
+
+});
 
 module.exports = app;
