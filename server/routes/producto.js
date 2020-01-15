@@ -25,7 +25,9 @@ app.get('/productos',[verificaToken], (req, res) => {
     Producto.find(query, { __v: 0 })
         .skip(desde)
         .limit(limite)
-        .populate('usuario categoria')
+//        .populate('usuario categoria')
+        .populate('usuario', 'nombre email')
+        .populate('categoria', 'descripcion')
         .exec(async(err, productos) => {
 
             if (err) return resError(res, err, 500)
@@ -61,7 +63,9 @@ app.get('/productos/:id',[verificaToken] , (req, res) => {
     Producto.findOne(query, { __v: 0 })
         .skip(desde)
         .limit(limite)
-        .populate('usuario categoria')
+        //        .populate('usuario categoria')
+        .populate('usuario', 'nombre email')
+        .populate('categoria', 'descripcion')
         .exec(async(err, productos) => {
 
             if (err) return resError(res, err, 500)
@@ -79,6 +83,31 @@ app.get('/productos/:id',[verificaToken] , (req, res) => {
 
 })
 
+// =======================
+// Buscar un producto
+// =======================
+app.get('/productos/buscar/:termino', [ verificaToken ], (req, res)=> {
+
+    let termino = req.params.termino
+
+    let regex = new RegExp(termino, 'i')
+
+    Producto.find({
+            nombre:regex
+        })
+        .populate('categoria', 'nombre')
+        .exec( (err, productos) => {
+
+            if (err) return resError(res, err, 500)
+
+            res.json({
+                ok:true,
+                productos
+            })
+
+        })
+})
+ 
 // =======================
 // Guardar un producto
 // =======================
@@ -103,7 +132,7 @@ app.post('/productos', [verificaToken], (req, res) => {
 
         if (err) return resError(res, err, 500)
 
-        res.json({
+        res.status(201).json({
             ok: true,
             document
         })
@@ -154,6 +183,36 @@ app.put('/productos/:id', [verificaToken], (req, res) => {
 // Eliminar un producto
 // =======================
 app.delete('/productos/:id', (req, res) => {
+
+    let productId = req.params.id
+
+    const update = {
+        disponible : false
+    }
+
+    let options = {
+        new: true,
+        runValidators: true
+    }
+
+    Producto.findByIdAndUpdate( productId, update, options, (err, producto) => {
+
+        if (err) return resError(res, err, 500)
+
+        if (!producto) {
+            let error = {
+                message: "Producto no encontrado"
+            }
+            return resError(res, error, 400)
+        }
+
+        res.json({
+            ok:true,
+            message: 'Producto eliminado',
+            producto
+        })
+
+    })    
 
 
 })
