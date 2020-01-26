@@ -30,9 +30,13 @@ services:
       - ./package.json:/app/package.json
     ports:
       - "3000:3000"
+      - "9229:9229"
     networks:
       - backend-network
   
 networks:
   backend-network:
     driver: bridge
+
+
+# "docker": "npm install && nodemon --inspect-brk=0.0.0.0 server/index.js"

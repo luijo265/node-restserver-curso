@@ -15,7 +15,7 @@
     },
     "scripts": {
         "start": "node server/index.js",
-        "docker": "npm install && nodemon server/index.js"
+        "docker": "npm install && nodemon --inspect=0.0.0.0 server/index.js"
     },
     "engines": {
         "node": "10.16.1"
