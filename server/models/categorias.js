@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 let categoriaSchema = new Schema({
-    description: {
+    descripcion: {
         type: String,
         unique: true,
         required: [
@@ -13,8 +13,8 @@ let categoriaSchema = new Schema({
     },
     usuario: {
         type: Schema.Types.ObjectId,
-        ref: 'Usuario'
+        ref: 'Usuario',
     }
 })
 
-module.exports = mongoose.modle('Categorias', categoriaSchema)
+module.exports = mongoose.model('Categorias', categoriaSchema)
