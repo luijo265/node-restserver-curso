@@ -21,18 +21,18 @@ app.get('/categoria', [verificaToken], (req, res) => {
     */
     Categoria.find({})
         .sort('descripcion')
-        .populate('usuario')
+        .populate('usuario', 'email nombre')
         .exec((err, categorias) => {
 
 
-        if (err) return resError(res, err, 500)
+            if (err) return resError(res, err, 500)
 
-        res.json({
-            ok: true,
-            categorias
+            res.json({
+                ok: true,
+                categorias
+            })
+
         })
-
-    })
 
 })
 
@@ -157,7 +157,7 @@ app.put('/categoria/:id', [verificaToken], (req, res) => {
 // Remover una nueva categoria
 // =======================
 // Solo un administrador y pedir token
-app.delete('/categoria/:id', [ verificaToken, verificaAdmin_role ], (req, res) => {
+app.delete('/categoria/:id', [verificaToken, verificaAdmin_role], (req, res) => {
 
     let id = req.params.id
 
@@ -171,7 +171,7 @@ app.delete('/categoria/:id', [ verificaToken, verificaAdmin_role ], (req, res) =
     }
 
     let query = {
-        _id: id, 
+        _id: id,
         usuario: req.usuario._id,
         estado: true
     }
