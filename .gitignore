@@ -2,3 +2,4 @@ node_modules/
 .vscode/
 docker/data
 docker/backup
+uploads/*

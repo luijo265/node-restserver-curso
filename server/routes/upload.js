@@ -6,6 +6,9 @@ const Usuario = require('../models/usuarios')
 
 const { resError } = require('./utils')
 
+const fs = require('fs')
+const path = require('path')
+
 // default options
 app.use(fileUpload({ useTempFiles: true }));
 
@@ -52,7 +55,7 @@ app.put('/upload/:tipo/:id', function(req, res) {
 	archivo.mv(`uploads/${ tipo }/${ nombreArchivo }`, (err) => {
 	    if (err) return resError(res,err)
 
-	    imagenUsuario(id, res)
+	    imagenUsuario(id, res, nombreArchivo)
 
 /*	    res.json({
 	    	ok:true,
@@ -63,21 +66,50 @@ app.put('/upload/:tipo/:id', function(req, res) {
 
 })
 
-function imagenUsuario (id, res){
+function imagenUsuario (id, res, nombreArchivo){
 
-	Usuario.findById(id, (err, docuemnt) => {
+	Usuario.findById(id, (err, documentDB) => {
 
 		if( err ) return resError(res,err)
 
-		if (!docuemnt) {
+		if (!documentDB) {
+			borrarImagen(nombreArchivo, 'usuarios')
+			
 			let error = {
 				message: 'Usuario no existe'
 			}
 			return resError(res,error,400)			
 		}
 
+		if (documentDB.img) {
+			borrarImagen(documentDB.img, 'usuarios')
+		}
+
+		documentDB.img = nombreArchivo
+
+		documentDB.save((err, usuarioSave) => {
+
+			if( err ) return resError(res,err)
+
+			res.json({
+				ok:true,
+				usuario:documentDB,
+				img:nombreArchivo
+			})
+
+		})
+
+
 	})
 
+}
+
+
+function borrarImagen(nombreImagen, tipo){
+	let pathImagen = path.resolve(__dirname, `../../uploads/${ tipo }/${ nombreImagen }`)
+	if ( fs.existsSync(pathImagen) ) {
+		fs.unlinkSync(pathImagen)
+	}
 }
 
 module.exports = app
