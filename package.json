@@ -11,7 +11,8 @@
         "mongoose": "^5.7.13",
         "mongoose-unique-validator": "^2.0.3",
         "underscore": "^1.9.1",
-        "google-auth-library": "^5.9.1"
+        "google-auth-library": "^5.9.1",
+        "express-fileupload": "^1.1.6"
     },
     "scripts": {
         "start": "node server/index.js",
