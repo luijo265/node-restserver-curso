@@ -3,16 +3,16 @@ const express = require('express')
 const fs = require('fs')
 const path = require('path')
 
+const { verificaUrlToken } = require('../middlewares/authentication')
+
 let app = express()
 
 
-app.get('/imagen/:tipo/:img', (req, res) => {
+app.get('/imagen/:tipo/:img', [verificaUrlToken], (req, res) => {
 
 	let { tipo, img } = req.params
 
-	let pathImg = `./uploads/${ tipo }/${ img }`
-
-	let imagePath = path.resolve(__dirname, '../uploads/${ tipo }/${ img }')
+	let imagePath = path.resolve(__dirname, `../../uploads/${ tipo }/${ img }`)
 
 	if ( fs.existsSync( imagePath ) ) {
 
