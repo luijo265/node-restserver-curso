@@ -3,6 +3,7 @@ const fileUpload = require('express-fileupload');
 const app = express();
 
 const Usuario = require('../models/usuarios')
+const Producto = require('../models/productos')
 
 const { resError } = require('./utils')
 
@@ -55,7 +56,15 @@ app.put('/upload/:tipo/:id', function(req, res) {
 	archivo.mv(`uploads/${ tipo }/${ nombreArchivo }`, (err) => {
 	    if (err) return resError(res,err)
 
-	    imagenUsuario(id, res, nombreArchivo)
+		switch( tipo ){
+			case 'productos':
+				imagenProducto(id, res, nombreArchivo)
+				break
+			case 'usuarios':
+	    		imagenUsuario(id, res, nombreArchivo)
+				break
+		}
+
 
 /*	    res.json({
 	    	ok:true,
@@ -74,7 +83,7 @@ function imagenUsuario (id, res, nombreArchivo){
 
 		if (!documentDB) {
 			borrarImagen(nombreArchivo, 'usuarios')
-			
+
 			let error = {
 				message: 'Usuario no existe'
 			}
@@ -87,13 +96,51 @@ function imagenUsuario (id, res, nombreArchivo){
 
 		documentDB.img = nombreArchivo
 
-		documentDB.save((err, usuarioSave) => {
+		documentDB.save((err, productoSave) => {
 
 			if( err ) return resError(res,err)
 
 			res.json({
 				ok:true,
 				usuario:documentDB,
+				img:nombreArchivo
+			})
+
+		})
+
+
+	})
+
+}
+
+function imagenProducto (id, res, nombreArchivo){
+
+	Producto.findById(id, (err, documentDB) => {
+
+		if( err ) return resError(res,err)
+
+		if (!documentDB) {
+			borrarImagen(nombreArchivo, 'productos')
+
+			let error = {
+				message: 'Usuario no existe'
+			}
+			return resError(res,error,400)			
+		}
+
+		if (documentDB.img) {
+			borrarImagen(documentDB.img, 'productos')
+		}
+
+		documentDB.img = nombreArchivo
+
+		documentDB.save((err, usuarioSave) => {
+
+			if( err ) return resError(res,err)
+
+			res.json({
+				ok:true,
+				producto:documentDB,
 				img:nombreArchivo
 			})
 
